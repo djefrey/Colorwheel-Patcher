@@ -1,5 +1,5 @@
 modLoader = "javafml"
-loaderVersion = "[47,)"
+loaderVersion = "[4,)"
 #issueTrackerURL = ""
 license = "MIT"
 
@@ -14,16 +14,16 @@ Autopatch supported shaders to be compatible with Colorwheel
 logoFile = "logo.png"
 
 [[dependencies.colorwheel_patcher]]
-modId = "forge"
-mandatory = true
-versionRange = "[47,)"
+modId = "neoforge"
+type = "required"
+versionRange = "[21.1,)"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.colorwheel_patcher]]
 modId = "minecraft"
-mandatory = true
-versionRange = "[1.20.1,)"
+type = "required"
+versionRange = "[1.21.1,)"
 ordering = "NONE"
 side = "BOTH"
 
@@ -33,3 +33,6 @@ mandatory = false
 versionRange = "[0,)"
 ordering = "AFTER"
 side = "BOTH"
+
+[[mixins]]
+config = "colorwheel_patcher.mixins.json"
