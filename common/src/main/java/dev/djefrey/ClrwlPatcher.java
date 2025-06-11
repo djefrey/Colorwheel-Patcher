@@ -108,6 +108,7 @@ public final class ClrwlPatcher
         try (Stream<Path> stream = Files.list(shadersFolder))
         {
             shaders = stream
+                    .filter(p -> p.getFileName().toString().endsWith(".zip") || Files.isDirectory(p))
                     .map(p -> p.getFileName().toString())
                     .toList();
         }
