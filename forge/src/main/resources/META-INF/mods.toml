@@ -1,0 +1,35 @@
+modLoader = "javafml"
+loaderVersion = "[47,)"
+#issueTrackerURL = ""
+license = "MIT"
+
+[[mods]]
+modId = "colorwheel_patcher"
+version = "${version}"
+displayName = "Colorwheel Patcher"
+authors = "djefrey"
+description = '''
+Autopatch supported shaders to be compatible with Colorwheel
+'''
+logoFile = "logo.png"
+
+[[dependencies.colorwheel_patcher]]
+modId = "forge"
+mandatory = true
+versionRange = "[47,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.colorwheel_patcher]]
+modId = "minecraft"
+mandatory = true
+versionRange = "[1.20.1,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.colorwheel_patcher]]
+modId = "euphoria_patcher"
+mandatory = false
+versionRange = "[0,)"
+ordering = "AFTER"
+side = "BOTH"

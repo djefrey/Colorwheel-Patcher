@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "id": "colorwheel_patcher",
+  "version": "${version}",
+  "name": "Colorwheel Patcher",
+  "description": "Autopatch supported shaders to be compatible with Colorwheel",
+  "authors": [
+    "djefrey"
+  ],
+  "license": "MIT",
+  "icon": "logo.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "dev.djefrey.fabric.ClrwlPatcherFabric"
+    ]
+  },
+  "mixins": [
+    "colorwheel_patcher.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.16.14",
+    "minecraft": "~1.20.1",
+    "java": ">=17"
+  },
+  "suggests": {
+    "euphoria_patches": "*"
+  }
+}
