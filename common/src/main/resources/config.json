@@ -14,7 +14,7 @@
         },
         {
             "shaderName": "Bliss",
-            "versions": ["main"]
+            "versions": ["main", "git", "f5f1e20"]
         }
     ]
 }
