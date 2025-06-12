@@ -7,7 +7,7 @@ pluginManagement {
     }
 }
 
-rootProject.name = 'Colorwheel-Patcher'
+rootProject.name = 'Colorwheel Patcher'
 
 include 'common'
 include 'fabric'
