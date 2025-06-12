@@ -4,13 +4,12 @@ import dev.djefrey.ClrwlPatcher;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 
-import dev.djefrey.ExampleMod;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.fml.loading.FMLPaths;
 
 import java.nio.file.Path;
 
-@Mod(ExampleMod.MOD_ID)
+@Mod(ClrwlPatcher.MOD_ID)
 public final class ClrwlPatcherNeoForge
 {
     public ClrwlPatcherNeoForge(IEventBus modBus)
