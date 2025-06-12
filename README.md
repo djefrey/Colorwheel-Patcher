@@ -1,6 +1,6 @@
 <div align="center">
 <img src=".github/logo.png" alt="Original logo by jnix, edited by djefrey" width="250">
-<h1>Colorwheel-Patcher</h1>
+<h1>Colorwheel Patcher</h1>
 </div>
 <br>
 
