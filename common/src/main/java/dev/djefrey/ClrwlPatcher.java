@@ -17,7 +17,7 @@ public final class ClrwlPatcher
     public static final String MOD_ID = "colorwheel_patcher";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
-    public static final String VERSION = "0.2.0";
+    public static final String VERSION = "0.2.1";
     public static final String BRAND_VERSION = "Colorwheel_" + VERSION;
 
     public static final String JAR_PATCHES_SUBPATH = "/patches/";
@@ -146,7 +146,7 @@ public final class ClrwlPatcher
         }).toList();
     }
 
-    private static void patchShaderpacks(List<ProcessedConfig.PatchConfig> patches, List<String> shaders, Path shadersFolder, Path configFolder)
+    private static void patchShaderpacks(List<ProcessedConfig.PatchConfig> patches, List<String> shaders, Path shaderpacksFolder, Path configFolder)
     {
         for (var shader : shaders)
         {
@@ -173,7 +173,7 @@ public final class ClrwlPatcher
             {
                 Path tmpFolder = createTmpDirectory();
 
-                var shaderpack = shadersFolder.resolve(shader);
+                var shaderpack = shaderpacksFolder.resolve(shader);
                 var patchedName = getPatchShaderpackName(shader, isZip);
 
                 if (isZip)
@@ -191,7 +191,17 @@ public final class ClrwlPatcher
                 try
                 {
                     var zipIn = patch.getPatchZip(configFolder);
-                    ZipUtils.extract(zipIn, tmpFolder.toFile());
+                    var shadersFolder = FileUtils.findFolderInChildren(tmpFolder.toFile(), "shaders");
+
+                    if (shadersFolder.isEmpty())
+                    {
+                        LOGGER.error("Could not find shaders/ in {}", shader);
+                        continue;
+                    }
+
+                    var parent = shadersFolder.get().getParentFile();
+
+                    ZipUtils.extract(zipIn, parent);
                 }
                 catch (FileNotFoundException e)
                 {
@@ -202,7 +212,7 @@ public final class ClrwlPatcher
 
                 if (isZip)
                 {
-                    var patchedPath = shadersFolder.resolve(patchedName + ".zip");
+                    var patchedPath = shaderpacksFolder.resolve(patchedName + ".zip");
 
                     ZipUtils.compress(tmpFolder.toFile(), patchedPath.toFile());
 
@@ -217,7 +227,7 @@ public final class ClrwlPatcher
                 }
                 else
                 {
-                    var patchedPath = shadersFolder.resolve(patchedName);
+                    var patchedPath = shaderpacksFolder.resolve(patchedName);
 
                     FileUtils.moveRecursive(tmpFolder, patchedPath);
                 }
