@@ -29,7 +29,7 @@ side = "BOTH"
 
 [[dependencies.colorwheel_patcher]]
 modId = "euphoria_patcher"
-mandatory = false
+type = "optional"
 versionRange = "[0,)"
 ordering = "AFTER"
 side = "BOTH"
