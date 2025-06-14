@@ -4,6 +4,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 
 public class FileUtils
 {
@@ -127,5 +128,56 @@ public class FileUtils
         {
             throw new IOException("Could not delete " + file);
         }
+    }
+
+    public static Optional<File> findFolderInChildren(File folder, String name)
+    {
+        if (folder.isDirectory())
+        {
+            File[] files = folder.listFiles();
+
+            if (files != null)
+            {
+                for (File file : files)
+                {
+                    var res = findFolderIn(file, name);
+
+                    if (res.isPresent())
+                    {
+                        return res;
+                    }
+                }
+            }
+        }
+
+        return Optional.empty();
+    }
+
+    public static Optional<File> findFolderIn(File folder, String name)
+    {
+        if (folder.isDirectory())
+        {
+            if (folder.getName().equals(name))
+            {
+                return Optional.of(folder);
+            }
+
+            File[] files = folder.listFiles();
+
+            if (files != null)
+            {
+                for (File file : files)
+                {
+                    var res = findFolderIn(file, name);
+
+                    if (res.isPresent())
+                    {
+                        return res;
+                    }
+                }
+            }
+        }
+
+        return Optional.empty();
     }
 }
