@@ -2,7 +2,7 @@
     "patches": [
         {
             "shaderName": "EuphoriaPatches",
-            "versions": ["1.6.3", "1.6.4"]
+            "versions": ["1.6.3", "1.6.4", "1.6.5"]
         },
         {
             "shaderName": "Complementary",
