@@ -37,6 +37,8 @@ dependencies {
     shadowBundle project(path: ':common', configuration: 'transformProductionForge')
 
     modLocalRuntime "maven.modrinth:euphoria-patches:${euphoria_version}-forge"
+    modLocalRuntime "maven.modrinth:embeddium:${embeddium_version}"
+    modLocalRuntime "maven.modrinth:oculus:${oculus_version}"
 }
 
 processResources {
