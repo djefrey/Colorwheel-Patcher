@@ -21,7 +21,8 @@ public record ClrwlConfig(List<PatchConfig> patches)
     }
 
     public record PatchConfig(String shaderName,
-                              List<String> versions)
+                              List<String> versions,
+                              List<String> aliases)
     {
     }
 }
