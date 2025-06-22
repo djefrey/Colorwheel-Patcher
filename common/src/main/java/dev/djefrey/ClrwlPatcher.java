@@ -1,5 +1,6 @@
 package dev.djefrey;
 
+import com.google.common.collect.Lists;
 import dev.djefrey.config.ClrwlConfig;
 import dev.djefrey.config.ProcessedConfig;
 import org.slf4j.Logger;
@@ -8,8 +9,9 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 public final class ClrwlPatcher
@@ -17,13 +19,18 @@ public final class ClrwlPatcher
     public static final String MOD_ID = "colorwheel_patcher";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
-    public static final String VERSION = "0.2.1";
-    public static final String BRAND_VERSION = "Colorwheel_" + VERSION;
+    public static final String BRAND = "Colorwheel";
+    public static final Version VERSION = new Version(0, 2, 2);
+    public static final String BRAND_VERSION = BRAND + "_" + VERSION;
 
     public static final String JAR_PATCHES_SUBPATH = "/patches/";
     public static final String USER_PATCHES_SUBPATH = "/patches/";
 
     public static final String CONFIG_FILENAME = "/config.json";
+
+    public static final Pattern CLRWL_BRAND_VERSION_REGEX = Pattern.compile(" \\+ Colorwheel_([0-9]+\\.[0-9]+\\.[0-9]+)");
+
+    public static final String OUTDATED_PREFIX = "§cOutdated§r ";
 
     public static void init(Path shadesrFolder, Path configFolder)
     {
@@ -37,16 +44,19 @@ public final class ClrwlPatcher
         }
 
         List<String> shaders = listShaderpacks(shadesrFolder);
-        shaders = filterPatchedShaderpacks(shaders);
+        Map<String, List<Version>> baseShaders = matchColorwheelShaders(shaders);
 
-        LOGGER.info("Non patched shaders: {}", shaders.size());
+        LOGGER.info("Existing base shaders: {}", baseShaders.size());
 
-        for (var shader : shaders)
+        for (var entry : baseShaders.entrySet())
         {
-            LOGGER.info(" - {}", shader);
+            List<String> versions = entry.getValue().stream().map(Version::toString).toList();
+
+            LOGGER.info(" - {} [{}]", entry.getKey(), String.join(", ", versions));
         }
 
-        patchShaderpacks(config.patches(), shaders, shadesrFolder, configFolder);
+        patchShaderpacks(config.patches(), baseShaders, shadesrFolder, configFolder);
+        flagOutdatedShaderpacks(baseShaders, shadesrFolder);
     }
 
     private static ProcessedConfig readPatchConfigs(Path configFolder)
@@ -121,35 +131,70 @@ public final class ClrwlPatcher
         return shaders;
     }
 
-    private static List<String> filterPatchedShaderpacks(List<String> shaders)
+    private static Map<String, List<Version>> matchColorwheelShaders(List<String> shaders)
     {
-        var clrwlShaders  = shaders.stream().filter(s -> s.contains(BRAND_VERSION)).toList();
+        List<String> nonClrwlShaders = new ArrayList<>();
+        Map<String, List<Version>> matchMap = new HashMap<>();
 
-        return shaders.stream().filter(shader ->
+        for (var shader : shaders)
         {
-            var isZip = shader.toLowerCase().endsWith(".zip");
-            Stream<String> potentialMatches;
-            String shaderName;
+            var nonClrwl = extractBaseShaderName(shader);
 
-            if (isZip)
+            if (nonClrwl.isPresent()) // Colorwheel shader
             {
-                shaderName = shader.substring(0, shader.length() - 4);
-                potentialMatches = clrwlShaders.stream().filter(s -> s.toLowerCase().endsWith(".zip"));
+                var version = extractColorwheelVersion(shader);
+
+                if (version.isEmpty())
+                {
+                    LOGGER.error("Could not extract Colorwheel version from {}", shader);
+                    continue;
+                }
+
+                String baseShader = nonClrwl.get();
+
+                matchMap.computeIfAbsent(baseShader, ($) -> new ArrayList<>())
+                        .add(version.get());
             }
             else
             {
-                shaderName = shader;
-                potentialMatches = clrwlShaders.stream().filter(s -> !s.toLowerCase().endsWith(".zip"));
+                nonClrwlShaders.add(shader);
+                matchMap.computeIfAbsent(shader, ($) -> new ArrayList<>());
             }
+        }
 
-            return potentialMatches.noneMatch((clrwl) -> clrwl.startsWith(shaderName));
-        }).toList();
+        // Remove Colorwheel matches without existing base shader
+
+        var keysToRm = matchMap.keySet().stream()
+                .filter((k) -> !nonClrwlShaders.contains(k))
+                .toList();
+
+        for (var key : keysToRm)
+        {
+            LOGGER.warn("Base shader '{}' does not exists", key);
+            matchMap.remove(key);
+        }
+
+        for (var entry : matchMap.entrySet())
+        {
+            entry.getValue().sort(Version::compareTo);
+        }
+
+        return matchMap;
     }
 
-    private static void patchShaderpacks(List<ProcessedConfig.PatchConfig> patches, List<String> shaders, Path shaderpacksFolder, Path configFolder)
+    private static void patchShaderpacks(List<ProcessedConfig.PatchConfig> patches, Map<String, List<Version>> baseShaders, Path shaderpacksFolder, Path configFolder)
     {
-        for (var shader : shaders)
+        for (var entry : baseShaders.entrySet())
         {
+            var shader = entry.getKey();
+            var clrwlVersions = entry.getValue();
+
+            if (clrwlVersions.contains(VERSION))
+            {
+                LOGGER.info("'{}' already patched with version {}", shader, VERSION);
+                continue;
+            }
+
             var maybePatch = patches.stream().filter(p -> shader.contains(p.shaderName())).findFirst();
 
             if (maybePatch.isEmpty())
@@ -169,12 +214,12 @@ public final class ClrwlPatcher
                 continue;
             }
 
+            var shaderpack = shaderpacksFolder.resolve(shader);
+            var patchedName = getPatchShaderpackName(shader, VERSION, isZip);
+
             try
             {
                 Path tmpFolder = createTmpDirectory();
-
-                var shaderpack = shaderpacksFolder.resolve(shader);
-                var patchedName = getPatchShaderpackName(shader, isZip);
 
                 if (isZip)
                 {
@@ -210,10 +255,10 @@ public final class ClrwlPatcher
                     continue;
                 }
 
+                var patchedPath = shaderpacksFolder.resolve(patchedName);
+
                 if (isZip)
                 {
-                    var patchedPath = shaderpacksFolder.resolve(patchedName + ".zip");
-
                     ZipUtils.compress(tmpFolder.toFile(), patchedPath.toFile());
 
                     try
@@ -227,14 +272,125 @@ public final class ClrwlPatcher
                 }
                 else
                 {
-                    var patchedPath = shaderpacksFolder.resolve(patchedName);
-
                     FileUtils.moveRecursive(tmpFolder, patchedPath);
                 }
             }
             catch (IOException e)
             {
                 LOGGER.error("Could not patch shaderpack", e);
+                continue;
+            }
+
+            try
+            {
+                Path ogConfigPath = null;
+
+                for (Version version : Lists.reverse(clrwlVersions))
+                {
+                    String filename = getPatchShaderpackName(shader, version, shader.endsWith(".zip")) + ".txt";
+                    Path path = shaderpacksFolder.resolve(filename);
+
+                    if (Files.exists(path))
+                    {
+                        ogConfigPath = path;
+                        break;
+                    }
+
+                    path = shaderpacksFolder.resolve(OUTDATED_PREFIX + filename);
+
+                    if (Files.exists(path))
+                    {
+                        ogConfigPath = path;
+                        break;
+                    }
+                }
+
+                if (ogConfigPath == null)
+                {
+                    Path path = shaderpacksFolder.resolve(shader + ".txt");
+
+                    if (Files.exists(path))
+                    {
+                        ogConfigPath = path;
+                    }
+                }
+
+                if (ogConfigPath != null)
+                {
+                    Path newConfigPath = shaderpacksFolder.resolve(patchedName + ".txt");
+
+                    LOGGER.info("Found option file '{}'", ogConfigPath.getFileName().toString());
+                    Files.copy(ogConfigPath, newConfigPath);
+                }
+                else
+                {
+                    LOGGER.info("Could not find option file for {}", shader);
+                }
+            }
+            catch (IOException e)
+            {
+                LOGGER.error("Could not copy shaderpack config file", e);
+                continue;
+            }
+        }
+    }
+
+    private static void flagOutdatedShaderpacks(Map<String, List<Version>> baseShaders, Path shaderpacksFolder)
+    {
+        for (var entry : baseShaders.entrySet())
+        {
+            var shader = entry.getKey();
+            var clrwlVersions = entry.getValue();
+
+            for (var version : clrwlVersions)
+            {
+                if (version.compareTo(VERSION) >= 0)
+                {
+                    continue;
+                }
+
+                String patchedShader = getPatchShaderpackName(shader, version, shader.endsWith(".zip"));
+                Path path = shaderpacksFolder.resolve(patchedShader);
+
+                if (!Files.exists(path))
+                {
+                    continue;
+                }
+
+                LOGGER.info("Flag '{}' as outdated", patchedShader);
+
+                Path outdatedPath = shaderpacksFolder.resolve(OUTDATED_PREFIX + patchedShader);
+
+                try
+                {
+                    Files.move(path, outdatedPath);
+                }
+                catch (IOException e)
+                {
+                    LOGGER.error("Could not set shader to outdated", e);
+                    continue;
+                }
+
+                Path configPath = shaderpacksFolder.resolve(patchedShader + ".txt");
+
+                if (!Files.exists(configPath))
+                {
+                    continue;
+                }
+
+                LOGGER.info("Flag config file as outdated");
+
+                Path outdatedConfigPath = shaderpacksFolder.resolve(OUTDATED_PREFIX + patchedShader + ".txt");
+
+                try
+                {
+                    Files.move(configPath, outdatedConfigPath);
+                }
+                catch (IOException e)
+                {
+                    LOGGER.error("Could not set config file to outdated", e);
+                    continue;
+                }
             }
         }
     }
@@ -244,15 +400,53 @@ public final class ClrwlPatcher
         return Files.createTempDirectory("clrwl-patcher");
     }
 
-    private static String getPatchShaderpackName(String shader, boolean isZip)
+    private static String getPatchShaderpackName(String shader, Version version, boolean isZip)
     {
         if (isZip)
         {
-            return shader.substring(0, shader.length() - 4) + " + " + BRAND_VERSION;
+            return shader.substring(0, shader.length() - 4) + " + " + BRAND + "_" + version + ".zip";
         }
         else
         {
-            return shader + " + " + BRAND_VERSION;
+            return shader + " + " + BRAND + "_" + version;
         }
     }
+
+    private static Optional<String> extractBaseShaderName(String shader)
+    {
+        Matcher matcher = CLRWL_BRAND_VERSION_REGEX.matcher(shader);
+
+        if (matcher.find())
+        {
+            String clean = matcher.replaceAll("");
+
+            if (clean.startsWith(OUTDATED_PREFIX))
+            {
+                clean = clean.substring(OUTDATED_PREFIX.length());
+            }
+
+            return Optional.of(clean);
+        }
+        else
+        {
+            return Optional.empty();
+        }
+    }
+
+    private static Optional<Version> extractColorwheelVersion(String shader)
+    {
+        Matcher matcher = CLRWL_BRAND_VERSION_REGEX.matcher(shader);
+
+        if (matcher.find())
+        {
+            int[] version = Arrays.stream(matcher.group(1).split("\\.")).mapToInt(Integer::parseInt).toArray();
+
+            return Optional.of(Version.fromArray(version));
+        }
+        else
+        {
+            return Optional.empty();
+        }
+    }
+
 }
