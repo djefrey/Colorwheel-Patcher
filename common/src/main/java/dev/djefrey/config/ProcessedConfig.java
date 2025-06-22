@@ -5,8 +5,6 @@ import dev.djefrey.ClrwlPatcher;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,11 +36,12 @@ public record ProcessedConfig(List<PatchConfig> patches)
 
     public record PatchConfig(String shaderName,
                               List<String> versions,
+                              List<String> aliases,
                               boolean userPatch)
     {
         public static PatchConfig fromFileEntry(ClrwlConfig.PatchConfig entry, boolean userConfig)
         {
-            return new PatchConfig(entry.shaderName(), entry.versions(), userConfig);
+            return new PatchConfig(entry.shaderName(), entry.versions(), entry.aliases(), userConfig);
         }
 
         public InputStream getPatchZip(Path configPath) throws FileNotFoundException
@@ -64,6 +63,11 @@ public record ProcessedConfig(List<PatchConfig> patches)
             }
 
             return res;
+        }
+
+        public boolean doesMatchWith(String str)
+        {
+            return str.contains(shaderName) || aliases.stream().anyMatch(str::contains);
         }
     }
 }

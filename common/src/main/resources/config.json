@@ -2,19 +2,23 @@
     "patches": [
         {
             "shaderName": "EuphoriaPatches",
-            "versions": ["1.6.3", "1.6.4", "1.6.5"]
+            "versions": ["1.6.3", "1.6.4", "1.6.5"],
+            "aliases": [" EP_"]
         },
         {
             "shaderName": "Complementary",
-            "versions": ["5.5.1"]
+            "versions": ["5.5.1"],
+            "aliases": []
         },
         {
             "shaderName": "BSL",
-            "versions": ["v10.0"]
+            "versions": ["v10.0"],
+            "aliases": []
         },
         {
             "shaderName": "Bliss",
-            "versions": ["main", "git", "f5f1e20"]
+            "versions": ["main", "git", "f5f1e20"],
+            "aliases": []
         }
     ]
 }

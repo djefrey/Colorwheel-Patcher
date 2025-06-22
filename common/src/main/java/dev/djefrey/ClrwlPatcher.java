@@ -195,7 +195,7 @@ public final class ClrwlPatcher
                 continue;
             }
 
-            var maybePatch = patches.stream().filter(p -> shader.contains(p.shaderName())).findFirst();
+            var maybePatch = patches.stream().filter(p -> p.doesMatchWith(shader)).findFirst();
 
             if (maybePatch.isEmpty())
             {
