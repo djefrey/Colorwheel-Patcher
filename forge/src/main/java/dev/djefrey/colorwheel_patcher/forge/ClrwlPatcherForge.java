@@ -1,6 +1,6 @@
-package dev.djefrey.forge;
+package dev.djefrey.colorwheel_patcher.forge;
 
-import dev.djefrey.ClrwlPatcher;
+import dev.djefrey.colorwheel_patcher.ClrwlPatcher;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;

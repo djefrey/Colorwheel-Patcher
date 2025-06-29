@@ -1,4 +1,4 @@
-package dev.djefrey.config;
+package dev.djefrey.colorwheel_patcher.config;
 
 import com.google.gson.Gson;
 

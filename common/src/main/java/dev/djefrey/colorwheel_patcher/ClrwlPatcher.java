@@ -1,8 +1,8 @@
-package dev.djefrey;
+package dev.djefrey.colorwheel_patcher;
 
 import com.google.common.collect.Lists;
-import dev.djefrey.config.ClrwlConfig;
-import dev.djefrey.config.ProcessedConfig;
+import dev.djefrey.colorwheel_patcher.config.ClrwlConfig;
+import dev.djefrey.colorwheel_patcher.config.ProcessedConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

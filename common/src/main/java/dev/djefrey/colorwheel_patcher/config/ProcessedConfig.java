@@ -1,6 +1,6 @@
-package dev.djefrey.config;
+package dev.djefrey.colorwheel_patcher.config;
 
-import dev.djefrey.ClrwlPatcher;
+import dev.djefrey.colorwheel_patcher.ClrwlPatcher;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;

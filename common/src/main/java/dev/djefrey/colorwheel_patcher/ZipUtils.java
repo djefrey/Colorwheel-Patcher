@@ -1,4 +1,4 @@
-package dev.djefrey;
+package dev.djefrey.colorwheel_patcher;
 
 import java.io.*;
 import java.util.zip.ZipEntry;
