@@ -12,7 +12,7 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "dev.djefrey.fabric.ClrwlPatcherFabric"
+      "dev.djefrey.colorwheel_patcher.fabric.ClrwlPatcherFabric"
     ]
   },
   "mixins": [

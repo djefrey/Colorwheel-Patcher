@@ -1,10 +1,11 @@
-package dev.djefrey.config;
+package dev.djefrey.colorwheel_patcher.config;
 
 import com.google.gson.Gson;
 
 import java.io.Reader;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 public record ClrwlConfig(List<PatchConfig> patches)
 {
@@ -18,6 +19,11 @@ public record ClrwlConfig(List<PatchConfig> patches)
         Gson loader = new Gson();
 
         return loader.fromJson(reader, ClrwlConfig.class);
+    }
+
+    public List<PatchConfig> patches()
+    {
+        return Objects.requireNonNullElse(this.patches, Collections.emptyList());
     }
 
     public record PatchConfig(String shaderName,

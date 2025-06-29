@@ -1,6 +1,6 @@
-package dev.djefrey.neoforge;
+package dev.djefrey.colorwheel_patcher.neoforge;
 
-import dev.djefrey.ClrwlPatcher;
+import dev.djefrey.colorwheel_patcher.ClrwlPatcher;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 
