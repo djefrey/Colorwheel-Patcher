@@ -449,4 +449,54 @@ public final class ClrwlPatcher
         }
     }
 
+    // Accessed by Colorwheel using reflection
+    public static Optional<String> findPatchedShaderpackInFolder(String shaderpack, Path shaderpacksFolder)
+    {
+        File folder = shaderpacksFolder.toFile();
+
+        if (!folder.isDirectory())
+        {
+            return Optional.empty();
+        }
+
+        var children = folder.listFiles();
+
+        if (children == null)
+        {
+            return Optional.empty();
+        }
+
+        Version maxVersion = null;
+        String patchedShaderpack = null;
+
+        for (File pack : children)
+        {
+            if (pack.getName().endsWith(".txt"))
+            {
+                continue;
+            }
+
+            var maybeBasePack = extractBaseShaderName(pack.getName());
+
+            if (maybeBasePack.isEmpty() || !maybeBasePack.get().equals(shaderpack))
+            {
+                continue;
+            }
+
+            var maybeVersion = extractColorwheelVersion(pack.getName());
+
+            if (maybeVersion.isEmpty())
+            {
+                continue;
+            }
+
+            if (maxVersion == null || maybeVersion.get().compareTo(maxVersion) > 0)
+            {
+                maxVersion = maybeVersion.get();
+                patchedShaderpack = pack.getName();
+            }
+        }
+
+        return Optional.ofNullable(patchedShaderpack);
+    }
 }
