@@ -20,7 +20,7 @@ public final class ClrwlPatcher
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
     public static final String BRAND = "Colorwheel";
-    public static final Version VERSION = new Version(0, 2, 2);
+    public static final Version VERSION = new Version(0, 2, 3);
     public static final String BRAND_VERSION = BRAND + "_" + VERSION;
 
     public static final String JAR_PATCHES_SUBPATH = "/patches/";
