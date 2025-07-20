@@ -22,7 +22,7 @@ public class ZipUtils
         {
             for (var child : children)
             {
-                zipFile(child, "/", out);
+                zipFile(child, "", out);
             }
         }
 
