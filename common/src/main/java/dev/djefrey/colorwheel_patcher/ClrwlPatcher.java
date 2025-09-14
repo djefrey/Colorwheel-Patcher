@@ -19,14 +19,15 @@ public final class ClrwlPatcher
     public static final String MOD_ID = "colorwheel_patcher";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
-    public static final String BRAND = "Colorwheel";
+    public static final String BRAND = "Clrwl";
 
     public static final String JAR_PATCHES_SUBPATH = "/patches/";
     public static final String USER_PATCHES_SUBPATH = "/patches/";
 
     public static final String CONFIG_FILENAME = "/config.json";
 
-    public static final Pattern CLRWL_BRAND_VERSION_REGEX = Pattern.compile(" \\+ Colorwheel_([0-9]+\\.[0-9]+\\.[0-9]+)");
+    public static final Pattern OLD_CLRWL_BRAND_VERSION_REGEX = Pattern.compile(" \\+ Colorwheel_([0-9]+\\.[0-9]+\\.[0-9]+)");
+    public static final Pattern CLRWL_BRAND_VERSION_REGEX = Pattern.compile(" \\+ Clrwl_([0-9]+\\.[0-9]+\\.[0-9]+)");
 
     public static final String OUTDATED_PREFIX = "§cOutdated§r ";
 
@@ -425,10 +426,22 @@ public final class ClrwlPatcher
 
             return Optional.of(clean);
         }
-        else
+
+        Matcher oldMatcher = OLD_CLRWL_BRAND_VERSION_REGEX.matcher(shader);
+
+        if (oldMatcher.find())
         {
-            return Optional.empty();
+            String clean = oldMatcher.replaceAll("");
+
+            if (clean.startsWith(OUTDATED_PREFIX))
+            {
+                clean = clean.substring(OUTDATED_PREFIX.length());
+            }
+
+            return Optional.of(clean);
         }
+
+        return Optional.empty();
     }
 
     private static Optional<Version> extractColorwheelVersion(String shader)
@@ -441,10 +454,17 @@ public final class ClrwlPatcher
 
             return Optional.of(Version.fromArray(version));
         }
-        else
+
+        Matcher oldMatcher = OLD_CLRWL_BRAND_VERSION_REGEX.matcher(shader);
+
+        if (oldMatcher.find())
         {
-            return Optional.empty();
+            int[] version = Arrays.stream(oldMatcher.group(1).split("\\.")).mapToInt(Integer::parseInt).toArray();
+
+            return Optional.of(Version.fromArray(version));
         }
+
+        return Optional.empty();
     }
 
     // Accessed by Colorwheel using reflection
