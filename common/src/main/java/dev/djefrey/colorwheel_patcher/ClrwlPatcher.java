@@ -401,13 +401,24 @@ public final class ClrwlPatcher
 
     private static String getPatchShaderpackName(String shader, Version version, boolean isZip)
     {
-        if (isZip)
+        String brand;
+
+        if (version.compareTo(new Version(1, 0, 0)) < 0)
         {
-            return shader.substring(0, shader.length() - 4) + " + " + BRAND + "_" + version + ".zip";
+            brand = "Colorwheel";
         }
         else
         {
-            return shader + " + " + BRAND + "_" + version;
+            brand = BRAND;
+        }
+
+        if (isZip)
+        {
+            return shader.substring(0, shader.length() - 4) + " + " + brand + "_" + version + ".zip";
+        }
+        else
+        {
+            return shader + " + " + brand + "_" + version;
         }
     }
 
