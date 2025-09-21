@@ -1,3 +1,16 @@
+### 1.0.0
+
+Patcher:
+- Fixes generated zips having a root "/"  
+This caused issues with the Euphoria Patches mod
+- Compressed the brand name to "Clrwl"
+
+Shaders:
+- Updated to be compatible with Colorwheel 1.0
+- Adds patches for Rethinking Voxels 0.1-beta9
+- Flags Euphoria 1.6.6 - 1.6.8 versions as compatible
+- Replaces Bliss version with 2.1.1
+
 ### 0.2.4
 
 Patcher:

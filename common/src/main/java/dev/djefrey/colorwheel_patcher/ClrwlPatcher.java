@@ -19,20 +19,19 @@ public final class ClrwlPatcher
     public static final String MOD_ID = "colorwheel_patcher";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
-    public static final String BRAND = "Colorwheel";
-    public static final Version VERSION = new Version(0, 2, 4);
-    public static final String BRAND_VERSION = BRAND + "_" + VERSION;
+    public static final String BRAND = "Clrwl";
 
     public static final String JAR_PATCHES_SUBPATH = "/patches/";
     public static final String USER_PATCHES_SUBPATH = "/patches/";
 
     public static final String CONFIG_FILENAME = "/config.json";
 
-    public static final Pattern CLRWL_BRAND_VERSION_REGEX = Pattern.compile(" \\+ Colorwheel_([0-9]+\\.[0-9]+\\.[0-9]+)");
+    public static final Pattern OLD_CLRWL_BRAND_VERSION_REGEX = Pattern.compile(" \\+ Colorwheel_([0-9]+\\.[0-9]+\\.[0-9]+)");
+    public static final Pattern CLRWL_BRAND_VERSION_REGEX = Pattern.compile(" \\+ Clrwl_([0-9]+\\.[0-9]+\\.[0-9]+)");
 
     public static final String OUTDATED_PREFIX = "§cOutdated§r ";
 
-    public static void init(Path shadesrFolder, Path configFolder)
+    public static void init(Version modVersion, Path shadesrFolder, Path configFolder)
     {
         ProcessedConfig config = readPatchConfigs(configFolder);
 
@@ -55,8 +54,8 @@ public final class ClrwlPatcher
             LOGGER.info(" - {} [{}]", entry.getKey(), String.join(", ", versions));
         }
 
-        patchShaderpacks(config.patches(), baseShaders, shadesrFolder, configFolder);
-        flagOutdatedShaderpacks(baseShaders, shadesrFolder);
+        patchShaderpacks(modVersion, config.patches(), baseShaders, shadesrFolder, configFolder);
+        flagOutdatedShaderpacks(modVersion, baseShaders, shadesrFolder);
     }
 
     private static ProcessedConfig readPatchConfigs(Path configFolder)
@@ -182,16 +181,16 @@ public final class ClrwlPatcher
         return matchMap;
     }
 
-    private static void patchShaderpacks(List<ProcessedConfig.PatchConfig> patches, Map<String, List<Version>> baseShaders, Path shaderpacksFolder, Path configFolder)
+    private static void patchShaderpacks(Version modVersion, List<ProcessedConfig.PatchConfig> patches, Map<String, List<Version>> baseShaders, Path shaderpacksFolder, Path configFolder)
     {
         for (var entry : baseShaders.entrySet())
         {
             var shader = entry.getKey();
             var clrwlVersions = entry.getValue();
 
-            if (clrwlVersions.contains(VERSION))
+            if (clrwlVersions.contains(modVersion))
             {
-                LOGGER.info("'{}' already patched with version {}", shader, VERSION);
+                LOGGER.info("'{}' already patched with version {}", shader, modVersion);
                 continue;
             }
 
@@ -215,7 +214,7 @@ public final class ClrwlPatcher
             }
 
             var shaderpack = shaderpacksFolder.resolve(shader);
-            var patchedName = getPatchShaderpackName(shader, VERSION, isZip);
+            var patchedName = getPatchShaderpackName(shader, modVersion, isZip);
 
             try
             {
@@ -335,7 +334,7 @@ public final class ClrwlPatcher
         }
     }
 
-    private static void flagOutdatedShaderpacks(Map<String, List<Version>> baseShaders, Path shaderpacksFolder)
+    private static void flagOutdatedShaderpacks(Version modVersion, Map<String, List<Version>> baseShaders, Path shaderpacksFolder)
     {
         for (var entry : baseShaders.entrySet())
         {
@@ -344,7 +343,7 @@ public final class ClrwlPatcher
 
             for (var version : clrwlVersions)
             {
-                if (version.compareTo(VERSION) >= 0)
+                if (version.compareTo(modVersion) >= 0)
                 {
                     continue;
                 }
@@ -427,10 +426,22 @@ public final class ClrwlPatcher
 
             return Optional.of(clean);
         }
-        else
+
+        Matcher oldMatcher = OLD_CLRWL_BRAND_VERSION_REGEX.matcher(shader);
+
+        if (oldMatcher.find())
         {
-            return Optional.empty();
+            String clean = oldMatcher.replaceAll("");
+
+            if (clean.startsWith(OUTDATED_PREFIX))
+            {
+                clean = clean.substring(OUTDATED_PREFIX.length());
+            }
+
+            return Optional.of(clean);
         }
+
+        return Optional.empty();
     }
 
     private static Optional<Version> extractColorwheelVersion(String shader)
@@ -443,10 +454,17 @@ public final class ClrwlPatcher
 
             return Optional.of(Version.fromArray(version));
         }
-        else
+
+        Matcher oldMatcher = OLD_CLRWL_BRAND_VERSION_REGEX.matcher(shader);
+
+        if (oldMatcher.find())
         {
-            return Optional.empty();
+            int[] version = Arrays.stream(oldMatcher.group(1).split("\\.")).mapToInt(Integer::parseInt).toArray();
+
+            return Optional.of(Version.fromArray(version));
         }
+
+        return Optional.empty();
     }
 
     // Accessed by Colorwheel using reflection
