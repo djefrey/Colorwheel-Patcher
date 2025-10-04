@@ -1,3 +1,8 @@
+### 1.0.1
+
+Shaders:
+- Updated Complementary patch to r5.6
+
 ### 1.0.0
 
 Patcher:
