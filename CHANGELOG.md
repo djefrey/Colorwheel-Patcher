@@ -1,3 +1,8 @@
+### 1.0.2
+
+Shaders:
+- Flag Complementary r5.6.1 as compatible
+
 ### 1.0.1
 
 Shaders:
