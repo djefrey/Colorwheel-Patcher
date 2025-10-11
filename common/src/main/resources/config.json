@@ -7,7 +7,7 @@
         },
         {
             "shaderName": "Complementary",
-            "versions": ["5.6"],
+            "versions": ["5.6", "5.6.1"],
             "aliases": []
         },
         {
