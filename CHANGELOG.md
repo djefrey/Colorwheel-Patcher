@@ -1,3 +1,11 @@
+### 1.0.3
+
+Patcher:
+- Sets correct homepage, sources and issues page links in mod description
+
+Shaders:
+- Adds patch for photon_v1.2a
+
 ### 1.0.2
 
 Shaders:
@@ -17,7 +25,7 @@ This caused issues with the Euphoria Patches mod
 
 Shaders:
 - Updated to be compatible with Colorwheel 1.0
-- Adds patches for Rethinking Voxels 0.1-beta9
+- Adds patch for Rethinking Voxels 0.1-beta9
 - Flags Euphoria 1.6.6 - 1.6.8 versions as compatible
 - Replaces Bliss version with 2.1.1
 
