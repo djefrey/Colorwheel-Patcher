@@ -7,6 +7,11 @@
   "authors": [
     "djefrey"
   ],
+  "contact": {
+    "homepage": "https://djefrey.github.io/colorwheel/",
+    "sources": "https://github.com/djefrey/Colorwheel-Patcher",
+    "issues": "https://github.com/djefrey/Colorwheel-Patcher/issues"
+  },
   "license": "ARR",
   "icon": "logo.png",
   "environment": "*",
