@@ -24,6 +24,11 @@
             "shaderName": "Bliss",
             "versions": ["2.1.1"],
             "aliases": []
+        },
+        {
+            "shaderName": "photon",
+            "versions": ["1.2a"],
+            "aliases": []
         }
     ]
 }
