@@ -17,12 +17,12 @@
         },
         {
             "shaderName": "BSL",
-            "versions": ["10.0"],
+            "versions": ["10.1"],
             "aliases": []
         },
         {
             "shaderName": "Bliss",
-            "versions": ["2.1.1"],
+            "versions": ["2.1.1", "2.1.2"],
             "aliases": []
         },
         {
