@@ -1,3 +1,8 @@
+### 1.0.5
+
+Shaders:
+- Updated Photon patch to 1.3a
+
 ### 1.0.4
 
 Shaders:
