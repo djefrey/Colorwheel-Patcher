@@ -2,10 +2,12 @@ package dev.djefrey.colorwheel_patcher.forge;
 
 import dev.djefrey.colorwheel_patcher.ClrwlPatcher;
 import dev.djefrey.colorwheel_patcher.Version;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.fml.loading.FMLPaths;
 
 import java.nio.file.Path;
@@ -18,12 +20,13 @@ public final class ClrwlPatcherForge
 
     public ClrwlPatcherForge()
     {
-        var modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
-
-        modEventBus.addListener(this::onCommonSetup);
+        if (FMLEnvironment.dist == Dist.CLIENT)
+        {
+            FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onClientSetup);
+        }
     }
 
-    private void onCommonSetup(final FMLCommonSetupEvent event)
+    private void onClientSetup(final FMLClientSetupEvent event)
     {
         var versionStr = ModList.get().getModContainerById(ClrwlPatcher.MOD_ID).get().getModInfo().getVersion().getQualifier();
         var matcher = VERSION_REGEX.matcher(versionStr);

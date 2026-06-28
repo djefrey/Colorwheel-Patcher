@@ -14,7 +14,7 @@
   },
   "license": "ARR",
   "icon": "logo.png",
-  "environment": "*",
+  "environment": "client",
   "entrypoints": {
     "main": [
       "dev.djefrey.colorwheel_patcher.fabric.ClrwlPatcherFabric"
